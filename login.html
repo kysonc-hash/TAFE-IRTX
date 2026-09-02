@@ -163,8 +163,8 @@ async function validateCredentials(event) {
     const hashedPass = await sha256(rawPass);
 
     // Cryptographic Signatures matching 'kyson' and 'GridMaster77!'
-    const targetUserHash = '0997ee6df5f1d7d54e4df9fb19ff3a27f6a7d5ea10166299e900c25a0b777a83';
-    const targetPassHash = '39f15cb6270bca5f10b77e844fa1fe7bdf4b4269f884ee7bbf86ce8823b1bf18';
+    const targetUserHash = '3cd67766c10f640d621cf8bf2572dd579b5e858823301de8a836df5d076380c7';
+    const targetPassHash = 'd9851a6fd38138cae1580ce37100b43dc1d818743908aa53688323e0bffd916c';
 
     // Verify signatures
     if (hashedUser === targetUserHash && hashedPass === targetPassHash) {
