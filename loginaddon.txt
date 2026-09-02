@@ -1,0 +1,18 @@
+<div style="text-align: center; margin-top: 30px;">
+    <button onclick="window.location.href='login.html'" style="
+        background: transparent;
+        color: #00f2fe;
+        border: 2px solid #00f2fe;
+        padding: 12px 30px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+        font-size: 1.1rem;
+        cursor: pointer;
+        text-shadow: 0 0 5px #00f2fe;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    " onmouseover="this.style.background='rgba(0, 242, 254, 0.1)'" onmouseout="this.style.background='transparent'">
+        [ Connect to Mainframe Grid ]
+    </button>
+</div>
