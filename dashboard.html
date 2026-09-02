@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>ENCOM OS-12 // Internal Mainframe</title>
+    <script>
+        // CRITICAL ACCESS CONTROL: Run BEFORE the browser paints the text elements
+        if (sessionStorage.getItem('encom_grid_auth') !== 'AUTHORIZED_SESSION_KEY_82') {
+            alert("CRITICAL ERROR: UNAUTHORIZED FOOTPRINT DETECTED // ACCESS DENIED");
+            window.location.href = 'login.html';
+        }
+    </script>
     <style>
         body {
             background-color: #020208;
@@ -34,7 +41,7 @@
             font-size: 1.3rem;
             color: #ff9500;
             font-weight: bold;
-            text-shadow: 0 0 8px rgba(ff, 95, 0, 0.4);
+            text-shadow: 0 0 8px rgba(255, 149, 0, 0.4);
         }
     </style>
 </head>
