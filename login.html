@@ -148,13 +148,12 @@ function validateCredentials(event) {
     const pass = document.getElementById('password').value;
     const errorZone = document.getElementById('errorZone');
 
-    // Matches the username from the chat log and password from the home setup photo
     if (user.toLowerCase() === 'kyson' && pass === 'GridMaster77!') {
-        // Clear errors and redirect cleanly to the destination page
+        // Create a temporary session token in the user's browser memory
+        sessionStorage.setItem('encom_grid_auth', 'AUTHORIZED_SESSION_KEY_82');
         errorZone.style.display = 'none';
         window.location.href = 'dashboard.html';
     } else {
-        // Show error message
         errorZone.style.display = 'block';
     }
 }
