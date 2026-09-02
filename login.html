@@ -161,6 +161,11 @@ async function validateCredentials(event) {
         // Wait for the hashing function to finish executing completely
         const hashedUser = await sha256(rawUser);
         const hashedPass = await sha256(rawPass);
+        // TEMPORARY DEBUG CODE - Paste right after the hashedUser / hashedPass calculation lines
+        // ---- ADD THESE TWO LINES FOR TESTING ----
+        alert("YOUR USER HASH: " + hashedUser);
+        alert("YOUR PASS HASH: " + hashedPass);
+        // ----------------------------------------
 
         // Your exact requested target signatures
         const targetUserHash = '3cd67766c10f640d621cf8bf2572dd579b5e858823301de8a836df5d076380c7'; // kyson
