@@ -141,15 +141,33 @@
 </div>
 
 <script>
-function validateCredentials(event) {
+<script>
+// Cryptographic helper to transform plain text into a SHA-256 string
+async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);                    
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);    
+    const hashArray = Array.from(new Uint8Array(hashBuffer));              
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');    
+}
+
+async function validateCredentials(event) {
     event.preventDefault();
     
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
+    // Normalize username inputs to lowercase to ensure consistency
+    const rawUser = document.getElementById('username').value.toLowerCase().trim();
+    const rawPass = document.getElementById('password').value;
     const errorZone = document.getElementById('errorZone');
 
-    if (user.toLowerCase() === 'kyson' && pass === 'GridMaster77!') {
-        // Create a temporary session token in the user's browser memory
+    // Convert inputs into hashes inside the memory layer
+    const hashedUser = await sha256(rawUser);
+    const hashedPass = await sha256(rawPass);
+
+    // Cryptographic Signatures matching 'kyson' and 'GridMaster77!'
+    const targetUserHash = '0997ee6df5f1d7d54e4df9fb19ff3a27f6a7d5ea10166299e900c25a0b777a83';
+    const targetPassHash = '39f15cb6270bca5f10b77e844fa1fe7bdf4b4269f884ee7bbf86ce8823b1bf18';
+
+    // Verify signatures
+    if (hashedUser === targetUserHash && hashedPass === targetPassHash) {
         sessionStorage.setItem('encom_grid_auth', 'AUTHORIZED_SESSION_KEY_82');
         errorZone.style.display = 'none';
         window.location.href = 'dashboard.html';
