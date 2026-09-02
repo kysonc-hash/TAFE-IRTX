@@ -141,7 +141,6 @@
 </div>
 
 <script>
-<script>
 // Cryptographic helper to transform plain text into a SHA-256 string
 async function sha256(message) {
     const msgBuffer = new TextEncoder().encode(message);                    
@@ -150,28 +149,33 @@ async function sha256(message) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');    
 }
 
+// CRITICAL FIX: The function itself must wait for the validation loop before doing anything else
 async function validateCredentials(event) {
-    event.preventDefault();
+    event.preventDefault(); // Stop the browser from refreshing the page immediately
     
-    // Normalize username inputs to lowercase to ensure consistency
     const rawUser = document.getElementById('username').value.toLowerCase().trim();
-    const rawPass = document.getElementById('password').value;
+    const rawPass = document.getElementById('password').value.trim(); // Trim spaces from inputs
     const errorZone = document.getElementById('errorZone');
 
-    // Convert inputs into hashes inside the memory layer
-    const hashedUser = await sha256(rawUser);
-    const hashedPass = await sha256(rawPass);
+    try {
+        // Wait for the hashing function to finish executing completely
+        const hashedUser = await sha256(rawUser);
+        const hashedPass = await sha256(rawPass);
 
-    // Cryptographic Signatures matching 'kyson' and 'GridMaster77!'
-    const targetUserHash = '3cd67766c10f640d621cf8bf2572dd579b5e858823301de8a836df5d076380c7';
-    const targetPassHash = 'd9851a6fd38138cae1580ce37100b43dc1d818743908aa53688323e0bffd916c';
+        // Your exact requested target signatures
+        const targetUserHash = '3cd67766c10f640d621cf8bf2572dd579b5e858823301de8a836df5d076380c7'; // kyson
+        const targetPassHash = 'd9851a6fd38138cae1580ce37100b43dc1d818743908aa53688323e0bffd916c'; // GridMaster77!
 
-    // Verify signatures
-    if (hashedUser === targetUserHash && hashedPass === targetPassHash) {
-        sessionStorage.setItem('encom_grid_auth', 'AUTHORIZED_SESSION_KEY_82');
-        errorZone.style.display = 'none';
-        window.location.href = 'dashboard.html';
-    } else {
+        // Verify signatures
+        if (hashedUser === targetUserHash && hashedPass === targetPassHash) {
+            sessionStorage.setItem('encom_grid_auth', 'AUTHORIZED_SESSION_KEY_82');
+            errorZone.style.display = 'none';
+            window.location.href = 'dashboard.html';
+        } else {
+            errorZone.style.display = 'block';
+        }
+    } catch (e) {
+        console.error("Crypto mismatch execution error:", e);
         errorZone.style.display = 'block';
     }
 }
