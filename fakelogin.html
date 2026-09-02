@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ENCOM OS-12 // Terminal Sign-In</title>
+    <style>
+        body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 90vh; margin: 0; }
+        .box { width: 400px; padding: 30px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: center; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; background: #040c1a; border: 1px solid #4facfe; color: #fff; margin-bottom: 20px; box-sizing: border-box; }
+        button { background: #00f2fe; color: #020208; border: none; padding: 12px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
+        button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Grid Node Authentication</h2>
+    <p>INTERNAL WORKSTATION ACCESS ONLY</p>
+    <form onsubmit="harvestCredentials(event)">
+        <input type="text" id="u" placeholder="IDENTITY HANDLE" required autocomplete="off">
+        <input type="password" id="p" placeholder="ACCESS TOKEN" required>
+        <button type="submit">Establish Handshake</button>
+    </form>
+</div>
+
+<script>
+function harvestCredentials(event) {
+    event.preventDefault();
+    const username = document.getElementById('u').value;
+    const password = document.getElementById('p').value;
+
+    // Create the forensic log text payload
+    const logData = `[HARVEST CAPTURE] USER: ${username} | PASS: ${password}\n`;
+
+    // Local Storage Persistence (Students can investigate browser state caches!)
+    localStorage.setItem('stolen_token_cache', btoa(logData));
+
+    // Simulation Trigger: Silently prompt a local administrative download artifact
+    const blob = new Blob([logData], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'encom_session_debug.txt'; // Drops into the user's Download directory
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    alert("CRITICAL LINK ERROR: Connection timeout. Redirecting to backup terminal node...");
+}
+</script>
+</body>
+</html>
