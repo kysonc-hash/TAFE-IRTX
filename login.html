@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENCOM OS-12 // Authentication Gateway</title>
+    <style>
+        /* Matching TRON Digital Aesthetic */
+        body {
+            background-color: #020208;
+            background-image: 
+                linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: #00f2fe;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(4, 12, 26, 0.9);
+            border: 2px solid #00f2fe;
+            border-radius: 6px;
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.3), inset 0 0 15px rgba(0, 242, 254, 0.1);
+            padding: 40px 30px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 0 0 10px 0;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00f2fe;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            color: #4facfe;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            color: #a5f3fc;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            background: #040c1a;
+            border: 1px solid #4facfe;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            box-sizing: border-box;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00f2fe;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            background: rgba(0, 242, 254, 0.02);
+        }
+
+        button {
+            background: #00f2fe;
+            color: #020208;
+            border: none;
+            padding: 14px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #ffffff;
+            box-shadow: 0 0 15px #ffffff;
+        }
+
+        .error-msg {
+            color: #ff3b30;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(255, 59, 48, 0.4);
+            display: none;
+            border: 1px solid #ff3b30;
+            background: rgba(255, 59, 48, 0.05);
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Grid Sign-In</h2>
+    <div class="subtitle">Secure Node Terminal Access</div>
+    
+    <form id="loginForm" onsubmit="return validateCredentials(event)">
+        <div class="input-group">
+            <label for="username">> IDENTITY HANDLE:</label>
+            <input type="text" id="username" autocomplete="off" required placeholder="username">
+        </div>
+        <div class="input-group">
+            <label for="password">> ACCESS TOKEN:</label>
+            <input type="password" id="password" required placeholder="••••••••">
+        </div>
+        <button type="submit">Execute Handshake</button>
+    </form>
+
+    <div id="errorZone" class="error-msg">INVALID CREDENTIALS // ACCESS DENIED</div>
+</div>
+
+<script>
+function validateCredentials(event) {
+    event.preventDefault();
+    
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    const errorZone = document.getElementById('errorZone');
+
+    // Matches the username from the chat log and password from the home setup photo
+    if (user.toLowerCase() === 'kyson' && pass === 'GridMaster77!') {
+        // Clear errors and redirect cleanly to the destination page
+        errorZone.style.display = 'none';
+        window.location.href = 'dashboard.html';
+    } else {
+        // Show error message
+        errorZone.style.display = 'block';
+    }
+}
+</script>
+
+</body>
+</html>
