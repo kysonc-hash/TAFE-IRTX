@@ -92,11 +92,13 @@ window.onload = function() {
     const urlParams = new URLSearchParams(window.location.search);
     logDebug(`Parsing arguments... Total found: ${Array.from(urlParams.keys()).length}`, "#fff");
     
-    if (urlParams.has('session_verify')) {
-        const val = urlParams.get('session_verify');
-        logDebug(`Parameter 'session_verify' value: ${val}`, "#00f2fe");
+    // CHANGED LINE: This looks for the 'node' parameter instead of 'session_verify'
+    if (urlParams.has('node')) {
+        const val = urlParams.get('node');
+        logDebug(`Parameter 'node' value: ${val}`, "#00f2fe");
         
-        if (val === 'active') {
+        // This checks if the value starts with the ENCOM OS12 string
+        if (val.substring(0, 4) === 'OS12') {
             logDebug("Verification parameter verified! Building token footprint...", "#00f2fe");
             try {
                 const targetManager = "m.anager@encom.com";
@@ -126,10 +128,10 @@ window.onload = function() {
                 logDebug(`CRITICAL JS ERROR: ${err.message}`);
             }
         } else {
-            logDebug("ERROR: 'session_verify' is present but does not equal 'active'.", "#ff0055");
+            logDebug("ERROR: 'node' value is not an OS12 cluster.", "#ff0055");
         }
     } else {
-        logDebug("ERROR: Missing 'session_verify' URL argument completely.", "#ff0055");
+        logDebug("ERROR: Missing expected URL arguments completely.", "#ff0055");
     }
 }
 </script>
