@@ -2,22 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ENCOM OS-12 // Central Grid Terminal</title>
+    <title>ENCOM OS-12 // Terminal Main</title>
     <style>
-        body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 95vh; margin: 0; }
-        .box { width: 500px; padding: 40px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: center; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
-        h1 { text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
-        .status { color: #39ff14; font-weight: bold; }
-        .btn { display: inline-block; width: 80%; background: #00f2fe; color: #020208; border: none; padding: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; text-decoration: none; margin-top: 30px; }
+        body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 95vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .box { width: 650px; padding: 40px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: left; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+        h1 { text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #00f2fe; padding-bottom: 10px; margin-top: 0; }
+        p { line-height: 1.6; margin-bottom: 20px; }
+        .alert-text { color: #ff0055; font-weight: bold; }
+        .btn { display: block; width: 250px; background: #00f2fe; color: #020208; border: none; padding: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; text-decoration: none; text-align: center; margin: 30px auto 10px auto; }
         .btn:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+        .footer { text-align: center; font-size: 11px; color: #4facfe; margin-top: 20px; border-top: 1px dashed #4facfe; padding-top: 15px; }
     </style>
 </head>
 <body>
 <div class="box">
-    <h1>ENCOM Central System</h1>
-    <p>Mainframe Routing Platform // Sector 4</p>
-    <p>Operational Status: <span class="status">ONLINE / SYNCHRONIZED</span></p>
-    <a href="login.html" class="btn">Sign In to Mainframe</a>
+    <h1>Encom</h1>
+    <p>Mainframe Access Portal // OS-12</p>
+    <p>SYSTEM: ONLINE</p>
+    <p>GRID STATUS: STABLE</p>
+    <p>SECURITY LEVEL: RESTRICTED</p>
+    <p>Welcome to the ENCOM Central Network. This terminal tracks corporate sector migration, localized grid protocols, and upcoming internal simulation upgrades. Unauthorized digital footprints inside the system grid are strictly monitored and logged by the security daemon.</p>
+    <p class="alert-text">NOTICE: LOCAL ASSET STAGING DIRECTORY ACTIVE. DO NOT DEPLOY ENCRYPTION KEYS TO UNSECURED BLOCKS.</p>
+    
+    <a href="login.html" class="btn">[ Connect to Mainframe Grid ]</a>
+    
+    <div class="footer">
+        © 1982-2026 ENCOM International. All Users Subject to Grid Protocol monitoring.
+    </div>
 </div>
 </body>
 </html>
