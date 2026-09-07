@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-// Enforce access control verification
+// Strict Access Control: Validate that the session is active AND the role is explicitly 'manager'
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION['role'] !== 'manager') {
-    // If not authenticated as manager, reject and redirect to login
+    // Terminate unauthorized access attempts silently or redirect to login
     header("Location: login.php");
     exit;
 }
@@ -23,11 +23,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
 <body>
 
 <div class="container">
-    <h1>Welcome to the ENCOM Central Network</h1>
+    <h1>Welcome to the ENCOM Central Network Portal</h1>
     <p>System Status: ONLINE</p>
-    <p>Security Level: RESTRICTED (Manager Session Active)</p>
+    <p>Current User: <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></p>
+    <p>Security Level: <strong>RESTRICTED // ADMINISTRATIVE CONTROL PANEL</strong></p>
     <hr>
-    <h3>Administrative Signing Keys</h3>
+    <h3>Administrative Controls</h3>
+    <p>This view is restricted entirely to users with Manager-level clearance.</p>
     <p>[SECURE_KEY_BLOCK_OS12-SEC4]</p>
     <hr>
     <p><a href="logout.php">Terminate Session (Logout)</a></p>
