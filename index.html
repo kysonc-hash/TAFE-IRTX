@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ENCOM OS-12 // Terminal Sign-In</title>
+    <style>
+        body { background-color: #020208; color: #00f2fe; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 95vh; margin: 0; }
+        .box { width: 400px; padding: 30px; border: 2px solid #00f2fe; background: rgba(4, 12, 26, 0.9); text-align: center; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; background: #040c1a; border: 1px solid #4facfe; color: #fff; margin-bottom: 20px; box-sizing: border-box; }
+        button { background: #00f2fe; color: #020208; border: none; padding: 12px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
+        button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>Grid Node Authentication</h2>
+    <p>INTERNAL WORKSTATION ACCESS ONLY</p>
+    <form onsubmit="event.preventDefault(); alert('ENCOM Core Notice: Connection profile verified. Grid status synchronized successfully.');">
+        <input type="text" placeholder="IDENTITY HANDLE" required autocomplete="off">
+        <input type="password" placeholder="ACCESS TOKEN" required>
+        <button type="submit">Establish Handshake</button>
+    </form>
+</div>
+</body>
+</html>
