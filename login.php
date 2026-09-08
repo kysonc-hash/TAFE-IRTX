@@ -2,16 +2,14 @@
 // Start a secure session
 session_start();
 
-// Define user credentials array with verified, uncorrupted bcrypt hashes
+// Dynamically generate uncorrupted, perfectly formatted hashes directly inside server memory
 $users = [
     "m.anager" => [
-        // Clean hash for password: "SecuredGrid2026!"
-        "password_hash" => '$2y$10$wSgH8YJzHOnA7pSghkCHHeV0N.9f8WpZl01E9vW9aKx2k7o6R4Kx2', 
+        "password_hash" => password_hash("SecuredGrid2026!", PASSWORD_BCRYPT),
         "role" => "manager"
     ],
     "kyson" => [
-        // Clean hash for password: "GridMaster77!"
-        "password_hash" => '$2y$10$.vX/WJ3B2sR4vK6zH9eOuO1g7Y8zP0x1y2z3u4i5o6p7q8r9s0t1u', 
+        "password_hash" => password_hash("GridMaster77!", PASSWORD_BCRYPT),
         "role" => "employee"
     ]
 ];
@@ -19,41 +17,35 @@ $users = [
 $error_message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Sanitize input to mitigate basic injection risks
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
     $password = $_POST['password'] ?? '';
 
-    // --- START DEBUG BLOCK ---
-    // If the login fails, this block outputs exactly what the server sees to isolate typos or truncation bugs
-    if (!array_key_exists($username, $users)) {
-        $error_message = "DEBUG: User '$username' not found in array. Check for trailing spaces or caching.";
-    } else {
-        $stored_hash = $users[$username]["password_hash"];
-        $verify_check = password_verify($password, $stored_hash) ? "TRUE" : "FALSE";
-        
-        // This prints details directly onto the screen if things don't match up
-        $error_message = "DEBUG LOGIFail:<br>" .
-                        "• Captured User: [" . htmlspecialchars($username) . "]<br>" .
-                        "• Input Password Length: " . strlen($password) . " chars<br>" .
-                        "• Stored Hash: <code>" . $stored_hash . "</code> (Length: " . strlen($stored_hash) . ")<br>" .
-                        "• Crypt Match Status: <strong>" . $verify_check . "</strong>";
-    }
-    // --- END DEBUG BLOCK ---
-
-    // Standard production verification loop
+    // Standard absolute verification loop
     if (array_key_exists($username, $users) && password_verify($password, $users[$username]["password_hash"])) {
-        $error_message = ""; // Clear out debug messages on successful match
+        // Regenerate session ID to prevent Session Fixation attacks
         session_regenerate_id(true);
         
+        // Store session variables dynamically based on the authenticated user
         $_SESSION['loggedin'] = true;
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $users[$username]["role"];
         
+        // Role-based routing
         if ($_SESSION['role'] === 'manager') {
             header("Location: manager_dashboard.php");
         } else {
             header("Location: employee.php");
         }
         exit;
+    } else {
+        // Fallback Debug message block to identify variables if authentication fails
+        $stored_hash = $users[$username]["password_hash"] ?? 'N/A';
+        $error_message = "DEBUG LOGIFail:<br>" .
+                        "• Captured User: [" . htmlspecialchars($username) . "]<br>" .
+                        "• Input Password Length: " . strlen($password) . " chars<br>" .
+                        "• Generated Hash: <code>" . $stored_hash . "</code> (Length: " . strlen($stored_hash) . ")<br>" .
+                        "• Crypt Match Status: <strong>FALSE</strong>";
     }
 }
 ?>
