@@ -2,10 +2,6 @@
 // Start a secure session
 session_start();
 
-<?php
-// Start a secure session
-session_start();
-
 // Define user credentials using universally supported native hashes
 $users = [
     "m.anager" => [
