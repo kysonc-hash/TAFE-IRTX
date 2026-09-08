@@ -57,3 +57,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ENCOM OS-12 Login</title>
+    <style>
+        body { background-color: #000; color: #00ffcc; font-family: monospace; padding: 50px; }
+        .login-box { border: 2px solid #00ffcc; padding: 20px; width: 300px; margin: 0 auto; }
+        input[type="text"], input[type="password"] { width: 100%; margin-bottom: 10px; background: #111; color: #fff; border: 1px solid #00ffcc; padding: 5px; }
+        input[type="submit"] { background: #00ffcc; color: #000; border: none; padding: 10px; width: 100%; cursor: pointer; }
+        .error { color: #ff3333; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Grid Node Authentication</h2>
+    <?php if (!empty($error_message)): ?>
+        <div class="error"><?php echo $error_message; ?></div>
+    <?php endif; ?>
+    <form action="login.php" method="POST">
+        <label>Username:</label>
+        <input type="text" name="username" required autocomplete="off">
+        
+        <label>Password:</label>
+        <input type="password" name="password" required>
+        
+        <input type="submit" value="ESTABLISH HANDSHAKE">
+    </form>
+</div>
+
+</body>
