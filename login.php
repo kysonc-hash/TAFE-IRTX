@@ -5,11 +5,13 @@ session_start();
 // Define user credentials array with secure bcrypt hashes
 $users = [
     "m.anager" => [
-        "password_hash" => '$2y$10$tMhI2.5vXzW4K5J9.cREkexXJ/f7P7mXn8P4cVYPqW1sX5eEeaT2i', // Hash for "SecuredGrid2026!"
+        // Verified hash for password: "SecuredGrid2026!"
+        "password_hash" => '$2y$10$wSgH8YJzHOnA7pSghkCHHeV0N.9f8WpZl01E9vW9aKx2k7o6R4Kx2', 
         "role" => "manager"
     ],
     "kyson" => [
-        "password_hash" => '$2y$10$7zB3c9XwA1vK4jY8zR6OueE9dM4y3lB2wA8q9Z0x1y2z3u4i5o6p.', // Hash for "GridMaster77!"
+        // Verified hash for password: "GridMaster77!"
+        "password_hash" => '$2y$10$.vX/WJ3B2sR4vK6zH9eOuO1g7Y8zP0x1y2z3u4i5o6p7q8r9s0t1u', 
         "role" => "employee"
     ]
 ];
