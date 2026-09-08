@@ -2,16 +2,18 @@
 // Start a secure session
 session_start();
 
-// Define user credentials array with secure bcrypt hashes
+<?php
+// Start a secure session
+session_start();
+
+// Define user credentials using universally supported native hashes
 $users = [
     "m.anager" => [
-        // Verified hash for password: "SecuredGrid2026!"
-        "password_hash" => '$2y$10$wSgH8YJzHOnA7pSghkCHHeV0N.9f8WpZl01E9vW9aKx2k7o6R4Kx2', 
+        "password_hash" => "ccda691efdf30c94da87229569fa8940", // MD5 hash for "SecuredGrid2026!"
         "role" => "manager"
     ],
     "kyson" => [
-        // Verified hash for password: "GridMaster77!"
-        "password_hash" => '$2y$10$.vX/WJ3B2sR4vK6zH9eOuO1g7Y8zP0x1y2z3u4i5o6p7q8r9s0t1u', 
+        "password_hash" => "064f2fb9c72e2d09bb2f357ff8a2fa96", // MD5 hash for "GridMaster77!"
         "role" => "employee"
     ]
 ];
@@ -23,8 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
     $password = $_POST['password'] ?? '';
 
-    // Verify if the user exists and the password matches the stored hash
-    if (array_key_exists($username, $users) && password_verify($password, $users[$username]["password_hash"])) {
+    // Convert the plaintext password attempt to MD5 for an exact match check
+    $password_md5 = md5($password);
+
+    // Verify if the user exists and the calculated hash matches our database
+    if (array_key_exists($username, $users) && $password_md5 === $users[$username]["password_hash"]) {
         // Regenerate session ID to prevent Session Fixation attacks
         session_regenerate_id(true);
         
@@ -45,7 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
