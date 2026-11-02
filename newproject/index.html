@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Grid // IRTx Portal</title>
+    <style>
+        :root {
+            --grid-color: #00e5ff;
+            --grid-glow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
+            --dark-bg: #020813;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            background-image: 
+                linear-gradient(rgba(0, 229, 255, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.07) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center;
+            font-family: 'Courier New', Courier, monospace;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Scanline Overlay for Cyber Retro Feel */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(2, 8, 19, 0.85);
+            padding: 40px 60px;
+            border: 2px solid var(--grid-color);
+            box-shadow: var(--grid-glow), inset 0 0 15px rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            z-index: 3;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-shadow: var(--grid-glow);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .btn {
+            display: block;
+            padding: 15px 20px;
+            color: var(--grid-color);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border: 1px solid var(--grid-color);
+            background: transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: var(--grid-color);
+            color: var(--dark-bg);
+            box-shadow: var(--grid-glow);
+            text-shadow: none;
+        }
+
+        /* System Status Indicator */
+        .status-panel {
+            margin-top: 35px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            border-top: 1px dashed rgba(0, 229, 255, 0.3);
+            padding-top: 15px;
+        }
+
+        .blink {
+            animation: blinker 1.5s linear infinite;
+            color: #00ff66;
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>I R T x</h1>
+        <div class="subtitle">System Portal // RightPoint</div>
+        
+        <div class="nav-links">
+            <!-- Link to your upcoming Login module -->
+            <a href="login.php" class="btn">Identity Verification</a>
+            
+            <!-- Link to your Game/App module -->
+            <a href="app.html" class="btn">Grid Simulation App</a>
+        </div>
+
+        <div class="status-panel">
+            System Status: <span class="blink">ONLINE</span><br>
+            Protocols: Red/Blue Playbook Consolidated
+        </div>
+    </div>
+
+</body>
+</html>
