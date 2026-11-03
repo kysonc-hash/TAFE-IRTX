@@ -11,7 +11,7 @@ except ImportError:
     print("[!] Error: dependency required. Run: pip install pygame")
     sys.exit(1)
 
-SERVER_IP = '127.0.0.1'  # Change this to match the server IP if running across different nodes
+SERVER_IP = '192.168.1.10'  # Change this to match the server IP if running across different nodes
 PORT = 65432
 
 pygame.init()
