@@ -5,26 +5,35 @@ import time
 import json
 import random
 import sqlite3
-from datetime import datetime
+import os
 
 HOST = '0.0.0.0'
 PORT = 65432
 GRID_SIZE = 80
 TICK_RATE = 0.1
-DB_FILE = 'grid_system.db'
 
-players = {}  # Format: { conn: { 'id', 'username', 'x', 'y', 'dx', 'dy', 'color', 'alive', 'trail', 'start_time' } }
+# =========================================================================
+# CONFIGURATION: Set your custom database storage file directory route here
+# =========================================================================
+DB_PATH = "grid_system.db"  # Can be a relative filename or an absolute path (e.g., "C:\\ProgramData\\grid_system.db")
+
+players = {}  # Format: { conn: { 'id', 'username', 'x', 'y', 'dx', 'dy', 'color', 'alive', 'trail' } }
 colors = [(0, 229, 255), (255, 0, 85), (255, 255, 0), (0, 255, 102)]
 color_idx = 0
 game_running = False
 lock = threading.Lock()
 
 def init_db():
-    """Initializes the database file and builds internal tables if absent."""
-    conn = sqlite3.connect(DB_FILE)
+    """Initializes the database file and builds the user table if absent."""
+    # Ensure target directory exists if an absolute directory path is supplied
+    db_dir = os.path.dirname(DB_PATH)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
+
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Core User Identity Registry
+    # Core User Identity Registry Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,56 +42,33 @@ def init_db():
         )
     ''')
     
-    # Leaderboard and High Score Event Analytics
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS high_scores (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            score REAL NOT NULL,
-            timestamp TEXT NOT NULL
-        )
-    ''')
-    
     # Populate the testing registry templates safely if table is fresh
     cursor.execute("SELECT COUNT(*) FROM users")
-    if cursor.fetchone()[0] == 0:
+    if cursor.fetchone() == 0:
         mock_profiles = [
             ('admin', 'GridControl2026'),
             ('alan', 'SecOpsShield99'),
-            ('bowie', 'MTUxdmJGUnZkVzVsTkRreA==') # Base64 microchip ID string
+            ('sam', 'MTUxdmJGUnZkVzVsTkRreA==') # Base64 microchip ID string
         ]
         cursor.executemany("INSERT INTO users (username, password) VALUES (?, ?)", mock_profiles)
         conn.commit()
-        print("[DATABASE] Default identity matrices compiled successfully.")
+        print(f"[DATABASE] Default identity matrices compiled successfully at: {os.path.abspath(DB_PATH)}")
         
     conn.close()
 
 def db_authenticate(username, password):
     """Performs isolated lookups to match connection profiles against user rows."""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT password FROM users WHERE LOWER(username) = LOWER(?)", (username.strip(),))
-    row = cursor.fetchone()
-    conn.close()
-    if row and row[0] == password:
-        return True
-    return False
-
-def record_high_score(username, score):
-    """Commits dynamic score logs to the analytics table when a vehicle crashes."""
     try:
-        conn = sqlite3.connect(DB_FILE)
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        cursor.execute(
-            "INSERT INTO high_scores (username, score, timestamp) VALUES (?, ?, ?)",
-            (username, round(score, 2), current_time)
-        )
-        conn.commit()
+        cursor.execute("SELECT password FROM users WHERE LOWER(username) = LOWER(?)", (username.strip(),))
+        row = cursor.fetchone()
         conn.close()
-        print(f"[DATABASE] Score committed for {username}: {round(score, 2)}s at {current_time}")
+        if row and row[0] == password:
+            return True
     except Exception as e:
-        print(f"[!] Database Write Exception: {e}")
+        print(f"[!] Database read error: {e}")
+    return False
 
 def handle_client(conn, addr):
     global color_idx
@@ -132,9 +118,7 @@ def handle_client(conn, addr):
             'dx': 1, 'dy': 0,
             'color': my_color,
             'alive': True,
-            'trail': [],
-            'start_time': time.time(),
-            'score_logged': False
+            'trail': []
         }
     
     # Dispatch matrix architecture guidelines out to client loop
@@ -185,13 +169,7 @@ def game_loop():
 
             # Step 2: Calculate path intersection and crash updates
             for conn1, p1 in players.items():
-                if not p1['alive']:
-                    # Trigger an immediate database logging insert upon vehicle degradation
-                    if not p1['score_logged']:
-                        survival_score = time.time() - p1['start_time']
-                        record_high_score(p1['username'], survival_score)
-                        p1['score_logged'] = True
-                    continue
+                if not p1['alive']: continue
                 
                 for conn2, p2 in players.items():
                     # Evaluate grid intersection overlap
