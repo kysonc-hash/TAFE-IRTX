@@ -1,54 +1,113 @@
-def handle_client(conn, addr, player_id):
-    global color_idx, game_running
-    print(f"[*] Node synchronization request observed from: {addr}")
-    
-    authenticated = False
-    username = str(player_id)
-    buffer = ""
+# client.py
+import socket
+import threading
+import json
+import sys
 
-    # Handshake Authentication Loop
-    while not authenticated:
+# Ensure desktop dependencies are verified inside local execution window
+try:
+    import pygame
+except ImportError:
+    print("[!] Error: dependency required. Run: pip install pygame")
+    sys.exit(1)
+
+SERVER_IP = '192.168.1.10'  # Change this to match the server IP if running across different nodes
+PORT = 65432
+
+pygame.init()
+font = pygame.font.SysFont('courier', 16)
+clock = pygame.time.Clock()
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((SERVER_IP, PORT))
+
+my_id = None
+grid_size = 80
+window_size = 640
+scale = window_size // grid_size
+screen = pygame.display.set_mode((window_size, window_size))
+pygame.display.set_caption("The Grid // Light Cycle Terminal")
+
+game_state = {}
+state_lock = threading.Lock()
+
+def network_ingress_worker():
+    global my_id, grid_size, scale, game_state
+    buffer = ""
+    while True:
         try:
-            data = conn.recv(1024).decode('utf-8')
-            if not data:
-                conn.close()
-                return
+            data = client_socket.recv(4096).decode('utf-8')
+            if not data: break
             buffer += data
             while "\n" in buffer:
                 line, buffer = buffer.split("\n", 1)
                 msg = json.loads(line)
                 
-                if msg.get('type') == 'login':
-                    user_try = msg.get('username', '')
-                    pass_try = msg.get('password', '')
-                    
-                    if db_authenticate(user_try, pass_try):
-                        print(f"[+] Authorization Success. Binding token to: '{user_try}'")
-                        authenticated = True
-                        username = user_try
-                        conn.sendall((json.dumps({'type': 'auth_success'}) + "\n").encode('utf-8'))
-                    else:
-                        print(f"[-] Defective authentication sequence signature for user: '{user_try}'")
-                        conn.sendall((json.dumps({'type': 'auth_failed'}) + "\n").encode('utf-8'))
-        except (ConnectionResetError, json.JSONDecodeError):
-            conn.close()
-            return
+                if msg.get('type') == 'init':
+                    my_id = msg['id']
+                    grid_size = msg['grid_size']
+                    scale = window_size // grid_size
+                elif msg.get('type') == 'state':
+                    with state_lock:
+                        game_state = msg['players']
+        except Exception as e:
+            print(f"[*] Ingress Vector Terminated: {e}")
+            break
 
-    print(f"[+] Operational Inbound Node Hooked: {addr} Assigned ID: {username}")
+threading.Thread(target=network_ingress_worker, daemon=True).start()
+
+def send_move(dx, dy):
+    packet = json.dumps({'type': 'move', 'dx': dx, 'dy': dy}) + "\n"
+    try:
+        client_socket.sendall(packet.encode('utf-8'))
+    except Exception:
+        pass
+
+running = True
+while running:
+    clock.tick(60) # Limits CPU drawing context cycle rate
     
-    with lock:
-        my_color = colors[color_idx % len(colors)]
-        color_idx += 1
-        players[conn] = {
-            'id': username, # Swapped numerical player_id out for validated username string
-            'x': random.randint(10, GRID_SIZE - 10),
-            'y': random.randint(10, GRID_SIZE - 10),
-            'dx': 1, 'dy': 0,
-            'color': my_color,
-            'alive': True,
-            'trail': []
-        }
+    # Process local window frame input events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key in [pygame.K_UP, pygame.K_w]:    send_move(0, -1)
+            elif event.key in [pygame.K_DOWN, pygame.K_s]:  send_move(0, 1)
+            elif event.key in [pygame.K_LEFT, pygame.K_a]:  send_move(-1, 0)
+            elif event.key in [pygame.K_RIGHT, pygame.K_d]: send_move(1, 0)
+
+    # Begin graphics composition loop
+    screen.fill((2, 8, 19))
     
-    # Handshake packet mapping environment constraints
-    handshake = {'type': 'init', 'id': username, 'grid_size': GRID_SIZE}
-    conn.sendall((json.dumps(handshake) + "\n").encode('utf-8'))
+    # Draw background matrix accents
+    for x in range(0, window_size, scale * 2):
+        pygame.draw.line(screen, (10, 30, 50), (x, 0), (x, window_size), 1)
+        pygame.draw.line(screen, (10, 30, 50), (0, x), (window_size, x), 1)
+
+    # Safe render pass over current frame state geometry
+    with state_lock:
+        for pid_str, p in game_state.items():
+            color = tuple(p['color'])
+            
+            # Reconstruct persistent trace segments
+            if len(p['trail']) > 1:
+                scaled_trail = [(pt[0] * scale + scale//2, pt[1] * scale + scale//2) for pt in p['trail']]
+                pygame.draw.lines(screen, color, False, scaled_trail, max(2, scale - 2))
+            
+            # Render bike element head nodes
+            if p['alive']:
+                pygame.draw.rect(screen, (255, 255, 255), (p['x'] * scale, p['y'] * scale, scale, scale))
+                # Add light cycle accent ring border
+                pygame.draw.rect(screen, color, (p['x'] * scale, p['y'] * scale, scale, scale), 1)
+            
+            # UI condition status rendering if host player crashes
+            if str(my_id) == pid_str and not p['alive']:
+                txt = font.render("CYCLE DEREGISTERED // DISCONNECTED", True, (255, 0, 85))
+                screen.blit(txt, (20, 20))
+
+    pygame.display.flip()
+
+pygame.quit()
+client_socket.close()
+
