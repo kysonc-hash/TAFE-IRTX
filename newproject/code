@@ -1,0 +1,54 @@
+def handle_client(conn, addr, player_id):
+    global color_idx, game_running
+    print(f"[*] Node synchronization request observed from: {addr}")
+    
+    authenticated = False
+    username = str(player_id)
+    buffer = ""
+
+    # Handshake Authentication Loop
+    while not authenticated:
+        try:
+            data = conn.recv(1024).decode('utf-8')
+            if not data:
+                conn.close()
+                return
+            buffer += data
+            while "\n" in buffer:
+                line, buffer = buffer.split("\n", 1)
+                msg = json.loads(line)
+                
+                if msg.get('type') == 'login':
+                    user_try = msg.get('username', '')
+                    pass_try = msg.get('password', '')
+                    
+                    if db_authenticate(user_try, pass_try):
+                        print(f"[+] Authorization Success. Binding token to: '{user_try}'")
+                        authenticated = True
+                        username = user_try
+                        conn.sendall((json.dumps({'type': 'auth_success'}) + "\n").encode('utf-8'))
+                    else:
+                        print(f"[-] Defective authentication sequence signature for user: '{user_try}'")
+                        conn.sendall((json.dumps({'type': 'auth_failed'}) + "\n").encode('utf-8'))
+        except (ConnectionResetError, json.JSONDecodeError):
+            conn.close()
+            return
+
+    print(f"[+] Operational Inbound Node Hooked: {addr} Assigned ID: {username}")
+    
+    with lock:
+        my_color = colors[color_idx % len(colors)]
+        color_idx += 1
+        players[conn] = {
+            'id': username, # Swapped numerical player_id out for validated username string
+            'x': random.randint(10, GRID_SIZE - 10),
+            'y': random.randint(10, GRID_SIZE - 10),
+            'dx': 1, 'dy': 0,
+            'color': my_color,
+            'alive': True,
+            'trail': []
+        }
+    
+    # Handshake packet mapping environment constraints
+    handshake = {'type': 'init', 'id': username, 'grid_size': GRID_SIZE}
+    conn.sendall((json.dumps(handshake) + "\n").encode('utf-8'))
